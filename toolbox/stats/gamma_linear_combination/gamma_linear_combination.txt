@@ -1,0 +1,67 @@
+
+class GammaLinearCombination:
+    def __init__(self, gamma_ab: list, const_vector: list = None):
+        """initialize by a list of gamma parameter paired lists and approximate distribution for the sum of those gamma distributed variables
+        
+        Args:
+            gamma_ab (List): [
+                                [alpha_1, beta_1],
+                                [alpha_2, beta_2],
+                                .
+                                . 
+                                [alpha_n, beta_n],
+                             ]
+                             include n paired lists for parameter alpha and beta
+            const_vector (List): constants vectors for linear combination
+        """
+        if const_vector is None:
+            self.c = [1] * len(gamma_ab)
+        else:
+            self.c = const_vector
+        
+    def percentile(self, p: float) -> float:
+        """return percentage value at given percentage
+
+        Args:
+            p (float): percentage; 0<p<1
+
+        Returns:
+            float: percentage value
+        """
+        return self._percentile(p)
+    
+    def cdf(self,x: float) -> float:
+        """return cumulative probability
+
+        Args:
+            x (float): value
+
+        Returns:
+            float: probability
+        """
+        return self._cdf(x)
+        
+    def pdf(self,x: float) -> float:
+        """return probability density
+
+        Args:
+            x (float): value
+
+        Returns:
+            float: probability
+        """
+        return self._pdf(x)
+
+    def rv(self, num: int =1) -> list:
+        """generate random variable(s)
+
+        Args:
+            num (int, optional): number of random variables. Defaults to 1.
+
+        Returns:
+            List: a list of generated random variables
+        """
+        return rvs
+
+    def plot_pdf(self):
+        return ANY_FIGURE_INSTANCE_FOR_PDF

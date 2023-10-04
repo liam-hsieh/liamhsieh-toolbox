@@ -1,0 +1,12 @@
+# Change log
+- 0.3.5: Update `DBConnector`; allow pulling data by chunks. `DataMigrator` is provided to automate the data migration from a database to Azure Blob Storage. `set_logger` is added into `utility` to simply run logging in Jupyter notebook. 
+- 0.3.4.6: update BlobConnector; fixed bug within method `file_upload` and add method `upload_parquet_from_df`
+- 0.3.4: provide string standardize method for `Feed`
+- 0.3.3: enhance method del_blob and add_folder for `BlobConnector`; also allows dumping a single spreadsheet from blob and convert to Pandas DataFrame
+- 0.3.2: add alpha version of `toolbox.streamlit.toybox` and `toolbox.streamlit.component`; no document for alpha version
+- 0.3.1: modify `toolbox.dao.connect.BlobConnector` to support virtual folder
+- 0.3.0: add `toolbox.dao.connect.BlobConnector` to support Azure Blob Storage
+- 0.2.3: add `df_dtype_refine` and `size_summary` for `attrDict` which has been inherited by `toolbox.dao.files.FileLoader` and default property in `toolbox.dao.Feed`
+- 0.2.2: replace `MssqlConnector` by `DBConnector`; supports MS SQL server and Oracle
+- 0.2.1: allow initializing an instance of `toolbox.dao.Feed` with `toolbox.dao.files.FileLoader`
+- 0.2.0: add `FileLoader` in `toolbox.dao.files`

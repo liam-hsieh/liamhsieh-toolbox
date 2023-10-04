@@ -1,0 +1,36 @@
+title: Toolbox
+site_author: Liam Hsieh 
+site_url: https://intel-sandbox.github.io/CnA-ODS-toolbox
+#team_name: Advanced Optimization and Decision Science
+
+#remote_theme: carlosperate/jekyll-theme-rtd
+
+#insert links.html to above nav.html in base.html
+links_section: false
+
+edit_on_github: false
+
+# markdown engine for Github page can only be kramdown or GFM (GitHub Flavored Markdown)
+# Since we use jekyll, a static site generator. Written in Ruby, to create contents for Github pages,
+# we use kramdown for having the best supports
+mathjax: true
+markdown: kramdown
+highlighter: rouge
+kramdown:
+   input: GFM
+   math_engine: mathjax
+   syntax_highlighter: rouge
+# GFM:
+#    math_engine: mathjax
+#    mathjax: true
+
+
+mermaid:
+   version: "9.1.6"
+#   # Version of mermaid library
+#   # Pick an available version from https://cdn.jsdelivr.net/npm/mermaid/ and ensure it matches js version we used
+
+  
+# exclude: 
+#   - assets/css/*
+
