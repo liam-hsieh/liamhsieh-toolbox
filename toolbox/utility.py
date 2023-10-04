@@ -14,7 +14,7 @@ from typing import (
 
 import numpy as np
 import pandas as pd
-
+import IPython
 
 
 LOGGING_LEVEL = Literal['DEBUG','INFO','WARNING','ERROR','CRITICAL']
@@ -121,3 +121,7 @@ def set_logger(log_level: LOGGING_LEVEL = 'INFO', use_file_config: bool = False,
         fileConfig(config_file, disable_existing_loggers=False)
 
     return logger
+
+
+def autosave_notebook():
+    IPython.display.Javascript('IPython.notebook.save_notebook()')

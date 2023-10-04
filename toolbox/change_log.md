@@ -1,4 +1,5 @@
 # Change log
+- 0.3.5.1: add `autosave_notebook` in `utility` module
 - 0.3.5: Update `DBConnector`; allow pulling data by chunks. `DataMigrator` is provided to automate the data migration from a database to Azure Blob Storage. `set_logger` is added into `utility` to simply run logging in Jupyter notebook. 
 - 0.3.4.6: update BlobConnector; fixed bug within method `file_upload` and add method `upload_parquet_from_df`
 - 0.3.4: provide string standardize method for `Feed`
