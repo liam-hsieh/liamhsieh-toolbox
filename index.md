@@ -19,4 +19,4 @@ You need to install CPLEX for your pyenv venv and then install docplex.
 2. Use the script `setup.py` located in your `$Cplexhome/python` (default is `/opt/ibm/ILOG/<CPLEX_VERSION>/python` on ADOS VM) with command `python setup.py install`
 3. install docplex `pip install docplex`
 
-Check [change log](liamhsieh-toolbox/toolbox/change_log) for new features added
+Check [change log](toolbox/change_log) for new features added
