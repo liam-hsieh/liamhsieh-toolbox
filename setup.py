@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="liamhsieh_toolbox",
-    version = '0.3.4.8',
+    version = '0.3.5',
     description = "Collections of Python utility, suppose to be built with Jonathan Carson but he left",
     author = 'Liam Y. Hsieh, PhD',
     author_email = 'liamhsieh@ieee.org',
@@ -14,7 +14,7 @@ setuptools.setup(
     long_description_content_type = "text/markdown",
     project_urls={
         'Homepage': 'https://github.com/liam-hsieh/liamhsieh-toolbox',
-        'Docs':'https://'
+        'Docs':'https://liam-hsieh.github.io/liamhsieh-toolbox/'
     },
     packages = setuptools.find_packages(),
     classifiers = [
