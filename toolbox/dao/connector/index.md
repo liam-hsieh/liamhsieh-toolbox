@@ -302,7 +302,7 @@ Args:
   db_access (dict): return of parse_db_access()
 ```
 
-### **method** toolbox.dao.connector.DBConnector.pull_SQL
+### toolbox.dao.connector.DBConnector.pull_SQL
 *method*, return the results of the SQL query
 ```nohighlight
 Args:
