@@ -100,17 +100,17 @@ print(FL.eng_hours) #alternative use: FL["eng_hours"]
 
 
           Area           WS_name  start_ww_num  engg_hours
-0        PHOTO        AMAT_6I_CD        202327      252.00
-1     DRY ETCH    AMAT_ADVTG_MET        202327       28.57
-2    DIFFUSION  AMAT_CENT_DPNRTP        202327       28.38
-3    DIFFUSION     AMAT_CENT_RPO        202327       65.68
-4    DIFFUSION    AMAT_CENT_RPO2        202327       79.75
+0        PHOTO        WS1        202327      252.00
+1     DRY ETCH    WS2        202327       28.57
+2    DIFFUSION  WS3        202327       28.38
+3    DIFFUSION     WS4        202327       65.68
+4    DIFFUSION    WS5        202327       79.75
 ..         ...               ...           ...         ...
-174        PVD      ULVAC_ENT_HM        202327       59.00
-175    IMPLANT  VARI_PLAD_HC_B2H        202327       17.47
-176    IMPLANT  VARI_PLAD_HC_BF3        202327       19.65
-177    IMPLANT   VARI_VST900P_MC        202327      120.96
-178    IMPLANT  VARI_VSTTRDXP_HC        202327      260.04
+174        PVD      WS6        202327       59.00
+175    IMPLANT  WS7        202327       17.47
+176    IMPLANT  WS8        202327       19.65
+177    IMPLANT   WS9        202327      120.96
+178    IMPLANT  WS10        202327      260.04
 
 [179 rows x 4 columns]
 ```
