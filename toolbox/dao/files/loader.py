@@ -10,15 +10,15 @@ import logging
 import pandas as pd
 import dask.dataframe as dd
 from pandas.core.frame import DataFrame
-import filetype
+
 
 from ...dao.feed import attrDict
 from .utility import (
     all_equal,
     count_folder_number,
     count_file_number,
-    create_nonduplicated_dict_key
 )
+
 
 # Exception class
 class StructError(ValueError):
@@ -139,27 +139,15 @@ def load_json2ad(file_path):
     }
     return dfs2dict
 
-class JSONEncoder(json.JSONEncoder):
-    def default(self, obj):
-        if isinstance(obj, DataFrame):
-            return obj.to_dict(orient='records')
-        return json.JSONEncoder.default(self, obj)
-
-def ad2json(ad, output_path):
-    export_file_name = f'{output_path}'
-
-    with open(export_file_name, 'w') as fp:
-        json.dump(ad, fp, cls=JSONEncoder, indent = 4)
-    
-
-def ad2csv():
-    return None
-
-def ad2sqlite():
-    return None
 
 
 class FileLoader(attrDict):
+    """_summary_
+
+    Supported format:
+        excel(xlsx): default is to load all worksheets
+        csv: separator can be assign to method `execute` as arg `sep` and its default is `','; note that `sep=None` means automatically detect 
+    """
     supported_format = (     
         '.xlsx',
         '.xlsb',
@@ -178,15 +166,10 @@ class FileLoader(attrDict):
             ".json": load_json2ad
         }
 
-    export_method = {
-        ".csv": ad2csv,
-        ".db" : ad2sqlite,
-        ".json":ad2json     
-    }
-
     __slots__ = (
         "_input_path",
         "_archive",
+        "_logger",
     )
 
     def __init__(self, path: str, archive = False):
@@ -214,20 +197,37 @@ class FileLoader(attrDict):
         All class properties should start with _ instead of those dataframes
         """
         self._input_path = path
-        self._archive = archive
+        self._archive = archive 
         self._logger = logging.getLogger(__name__)
-        
 
-    def execute(self):
+    def _parse_path(self):
+        ftype = None
         if pathlib.Path(self._input_path).is_dir():
-            self._load_when_path_is_folder(archive=False)
+            path_is_for_dir = True
         elif pathlib.Path(self._input_path).is_file():
+            path_is_for_dir = False
             ftype = ftype_detect(self._input_path)
+        else:
+            raise Exception("path can only be an existing file or path")
+            
+        return path_is_for_dir, ftype
 
+    @property
+    def _pureDict(self):
+        return {k:self[k] for k in self.keys() if k not in self.__slots__ and not isinstance(self[k],logging.Logger)}
+
+
+    def execute(self, **kwargs):
+        path_is_for_dir, ftype = self._parse_path()
+
+        if path_is_for_dir:
+            self._load_when_path_is_folder(archive=False,**kwargs)
+
+        elif ftype is not None:
             if self._archive:
-                self._load_when_path_is_folder(archive=True)
+                self._load_when_path_is_folder(archive=True, **kwargs)
             elif ftype in self.supported_format:
-                self._load_to_attrDict([self._input_path,],True,ftype)
+                self._load_to_attrDict([self._input_path,],True,ftype, **kwargs)
 
         else:
             exception_msg = "path should only point to a directory or a file (could be an archive with optional argument archive = True"
@@ -235,27 +235,19 @@ class FileLoader(attrDict):
             raise TypeError(exception_msg)
     
 
-
-    # def export(self, dtype: str, output_path: str, **kwargs):
-    #     if all(isinstance(v,DataFrame) for v in jad.values()):
-
-    #     pass
-
-
-
-    def _load_to_attrDict(self,contents:list[str], single_file:bool, file_type:str):
+    def _load_to_attrDict(self,contents:list[str], single_file:bool, file_type:str, **kwargs):
 
         if single_file:
             match file_type:
                 case '.xlsx':
-                    _ = [self.update({k:v for k,v in  FileLoader.load_method[file_type](contents[0], sheet_name=None).items()})]
+                    _ = [self.update({k:v for k,v in  FileLoader.load_method[file_type](contents[0], sheet_name=None, **kwargs).items()})]
                 case other:
-                    self.update({pathlib.Path(contents[0]).stem.replace(' ', '_'):FileLoader.load_method[file_type](contents[0])})
+                    self.update({pathlib.Path(contents[0]).stem.replace(' ', '_'):FileLoader.load_method[file_type](contents[0],**kwargs)})
         else:
-            _ = [self.update({pathlib.Path(c).stem.replace(' ', '_'): FileLoader.load_method[file_type](c)}) for c in contents]
+            _ = [self.update({pathlib.Path(c).stem.replace(' ', '_'): FileLoader.load_method[file_type](c,**kwargs)}) for c in contents]
 
 
-    def _load_when_path_is_folder(self, archive):
+    def _load_when_path_is_folder(self, archive, **kwargs):
         temp_dir = None
         if archive:
             temp_dir = tempfile.TemporaryDirectory()
@@ -278,7 +270,7 @@ class FileLoader(attrDict):
         
 
 
-    def _load_feed_from_source_dir(self,target_dir:str) -> attrDict:
+    def _load_feed_from_source_dir(self,target_dir:str, **kwargs) -> attrDict:
         """load data from files in target directory to an instance of attrDict
 
         Args:
@@ -308,12 +300,12 @@ class FileLoader(attrDict):
             raise InconsistentError
         elif (num_file>1) and (identical_ftype==True):
             if file_type in ['.csv','.parquet','.pkl']:
-                self._load_to_attrDict(contents, single_file=False, file_type= file_type)
+                self._load_to_attrDict(contents, single_file=False, file_type= file_type, **kwargs)
             else:
                 raise FormatError
         elif num_file==1:
             if file_type in self.supported_format:
-                self._load_to_attrDict(contents,single_file=True, file_type = file_type)
+                self._load_to_attrDict(contents,single_file=True, file_type = file_type, **kwargs)
             else:
                 raise FormatError
         else:

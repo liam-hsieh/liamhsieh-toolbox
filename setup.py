@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="liamhsieh_toolbox",
-    version = '0.3.5',
+    version = '0.3.5.2',
     description = "Collections of Python utility, suppose to be built with Jonathan Carson but he left",
     author = 'Liam Y. Hsieh, PhD',
     author_email = 'liamhsieh@ieee.org',
@@ -25,11 +25,12 @@ setuptools.setup(
     #packages = ['toolbox'], #, since I only have a subfolder, toolbox, below setup.py and I don't wanna include docs as well, I just manually list what I need  
     python_requires='>=3.10',
     install_requires=[
-        'pandas>=2.0',
-        'sqlalchemy>=1.4.40',
+        'pandas>=2.2',
+        'sqlalchemy>=2.0',
         'openpyxl>=3.0.10',
+        'xlsxwriter>=3.2.0',
         'pyxlsb>=1.0.9',
-        'dask>=2022.8.1',
+        'dask>=2024.5.0',
         'filetype>=1.1.0',
         'cx-Oracle>=8.3.0',
         'pyodbc>=4.0.0',
@@ -41,6 +42,7 @@ setuptools.setup(
         'streamlit>=1.13.0',
         'streamlit-drawable-canvas>=0.9.2',
         'streamlit-aggrid>=0.3.3',
-        'azure-storage-blob>=12.14.0'
+        'azure-storage-blob>=12.14.0',
+        'pymysql>=1.1'
     ]
 )

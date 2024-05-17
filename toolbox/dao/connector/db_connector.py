@@ -20,7 +20,7 @@ _cache_mode_options = Literal[0,1,2]
 
 
 def parse_db_access(config_path: str, section_name:str)->Dict:
-    """parse the configuration file to acquire required information for connecting MsSql DB
+    """parse the configuration file to acquire required information for connecting supporting DBs
 
     Args:
         config_path (str): path of configuration file
@@ -230,7 +230,10 @@ class DBConnector:
     default_port = {
             "ORACLE":1521,
             "MSSQL":1433,
-            "AZURE-BLOB":None
+            "AZURE-BLOB":None,
+            "MYSQL":3307,
+            "REDIS":6380,
+            "MONGODB":7374,
         }
 
     def __init__(self, db_access, **kwargs):
@@ -319,9 +322,10 @@ class DBConnector:
         return f"{self._db_access.server_username}/{self._db_access.server_password}@{self._db_access.server}:{self._port}/{self._db_access.service_name}"
         
     def _get_oracle_conn_str(self):
-        conn_str = f'oracle+cx_oracle://{self._db_access["server_username"]}:{self._db_access["server_password"]}@{self._db_access["server"]}:{self._port}/?service_name={self._db_access["service_name"]}'
+        return f'oracle+cx_oracle://{self._db_access["server_username"]}:{self._db_access["server_password"]}@{self._db_access["server"]}:{self._port}/?service_name={self._db_access["service_name"]}'
 
-        return conn_str
+    def _get_mariadb_conn_str(self):
+        return f"mysql+pymysql://{self._db_access['user']}:{self._db_access['password']}@{self._db_access['host']}:{self._db_access['port']}/{self._db_access['database']}"
 
     @property
     def _conn_str(self):
@@ -329,6 +333,7 @@ class DBConnector:
         conn_str = {
             "MSSQL": self._get_mssql_conn_str,
             "ORACLE": self._get_oracle_conn_str,
+            "MARIADB": self._get_mariadb_conn_str,
         }
 
         return conn_str[self._db_type]()
@@ -361,6 +366,53 @@ class DBConnector:
             )
         return query_str
 
+    def dump_to_db(
+            self,
+            df,
+            dest_tb_name,
+            is_fast_executemany = True,
+            index = False,
+            index_label=None,
+            if_exists = 'append',
+            dtype = None,
+            chunksize = None,
+            method=None,
+    ):
+        """_summary_
+
+        Args:
+            df (_type_): _description_
+            dest_tb_name (_type_): _description_
+            is_fast_executemany (bool, optional): _description_. Defaults to True.
+            is_index (bool, optional): add index automatically. Defaults to False.
+            if_exists (str, optional): what to do while data exists in table. 'fail', 'replace', 'append'. Defaults to 'append'.
+                                    How to behave if the table already exists.
+                                    fail: Raise a ValueError.
+                                    replace: Drop the table before inserting new values.
+                                    append: Insert new values to the existing table.
+            dtype (dict, optional): dict to dedicate the dtype for each columns. Defaults to None.
+                                    example dtype:
+                                    using df column names as keys
+                                    {
+                                    'datefld': sqlalchemy.DateTime(), 
+                                    'intfld':  sqlalchemy.types.INTEGER(),
+                                    'strfld': sqlalchemy.types.NVARCHAR(length=255)
+                                    'floatfld': sqlalchemy.types.Float(precision=3, asdecimal=True)
+                                    'booleanfld': sqlalchemy.types.Boolean
+                                    }   
+        """
+        try: 
+            conn_str = self._conn_str
+            eng = create_engine(conn_str, fast_executemany = is_fast_executemany)
+
+            with eng.connect() as conn:
+                df.to_sql(dest_tb_name, conn, if_exists = if_exists, index = index, index_label=index_label, chunksize=chunksize, dtype=dtype,method=method)
+        
+        except Exception as e:
+            self.logger.error(e) 
+
+
+    
     def pull_SQL(
             self,
             query,
@@ -375,24 +427,27 @@ class DBConnector:
             df (DataFrame): results of executing SQL statement if it has return and chunk_size<2 or None
             dfs_generator (Generator): generator for all resulted chunks if chunk_size>1
         """
-        conn_str = self._conn_str
-        eng = create_engine(conn_str)
+        try:
+            conn_str = self._conn_str
+            eng = create_engine(conn_str)
 
-        with eng.connect() as conn:
-            if chunk_size in (None,1):
-                df = pd.read_sql(
-                    sql_text(query),
-                    conn,
-                )
-                return df
-            else:
-                dfs_generator = pd.read_sql(
-                    sql_text(query),
-                    conn,
-                    chunksize=chunk_size
-                )
-                return dfs_generator
-            
+            with eng.connect() as conn:
+                if chunk_size in (None,1):
+                    df = pd.read_sql(
+                        sql_text(query),
+                        conn,
+                    )
+                    return df
+                else:
+                    dfs_generator = pd.read_sql(
+                        sql_text(query),
+                        conn,
+                        chunksize=chunk_size
+                    )
+                    return dfs_generator
+        except Exception as e:
+            self.logger.error(e)       
+
     @staticmethod
     def dump_dfs_generator(dfs_generator, keys:list=None):
         """Dump DataFrames from a generator into a dictionary.

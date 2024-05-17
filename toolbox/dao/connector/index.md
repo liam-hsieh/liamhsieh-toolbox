@@ -3,6 +3,7 @@
 
 - MS SQL Server
 - Oracle
+- Azure Blob Storage
 
 ## toolbox.dao.connector.parse_db_access
 *function*, parse the , e.g., db.ini, to acquire required information for connecting DB.

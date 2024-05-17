@@ -1,4 +1,5 @@
 import pathlib
+import os
 from collections.abc import KeysView
 
 def all_equal(iterator):
@@ -31,7 +32,7 @@ def create_nonduplicated_dict_key(dict_key:str,keys:KeysView, addition = "_") ->
     Returns:
         str: confirmed key for futher insert 
     """
-    if not isinstance(d.keys(),KeysView):
+    if not isinstance(dict_key.keys(),KeysView):
         raise TypeError('keys needs to be a dict_keys')
 
     if dict_key not in list(keys):
@@ -39,3 +40,23 @@ def create_nonduplicated_dict_key(dict_key:str,keys:KeysView, addition = "_") ->
     else:
         return create_nonduplicated_dict_key(''.join((dict_key,addition)),keys)
 
+def ensure_directory_exists(output_path: str, create_if_nonexistence:bool=True):
+    """
+    Check if the directory for the output path exists, and create it if it doesn't.
+
+    Args:
+        output_path (str): The path where the output will be saved.
+    """
+    directory = os.path.dirname(output_path)
+
+    # handle the case if only file name provided as output path, set it as current working directory
+    if directory=='': 
+        directory='.'
+
+    # Check if the directory exists, and create it if it doesn't
+    if not os.path.exists(directory):
+        if create_if_nonexistence:
+            os.makedirs(directory, exist_ok=True)
+        return False
+    else:
+        return True

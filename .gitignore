@@ -8,6 +8,8 @@ log/
 _testing/
 db.ini
 test.ipynb
+test.xlsx
+test.csv
 #scenario/
 
 # Created by https://www.toptal.com/developers/gitignore/api/python,julia,jupyternotebooks,visualstudiocode,notepadpp,octave,r,matlab

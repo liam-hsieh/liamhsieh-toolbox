@@ -4,14 +4,6 @@ As the core data structure in the field of data analytics, Dataframe has been wi
 
 The class *Loader* provides the basic functionality for loading data from those essential data sources/types and storing the data in Dataframe(s) which are organized by a Python Dictionary. If the data sources are a number of spreadsheets, the Python Dictionary is going to be composed of several key-value pairs that uses names of spreadsheets as key and Dataframes as value. 
 
-It also has an *export* method to convert the Dictionary to flat files, the supported formats are:  
-
-- **CSV**: the Dictionary keys will be the file names of csv
-- **Excel**:  the Dictionary keys will be the worksheet names
-- **Sqlite**: the Dictionary keys will be the table names
-- **JSON**: the Dictionary keys will be the properties name; the Dictionary value(s), Dataframe, will be JSON array(s) 
-
-
 ## toolbox.dao.files.FileLoader
 *class*
 ```nohighlight
@@ -19,10 +11,6 @@ Args:
     path (str): a path to a file or directory
     archive (bool, optional): if an archive file is the target of the path. Defaults to False.
 ```
-
-## toolbox.dao.files.FileLoader.execute
-*method*, load file(s) 
-
 argument `path` could be the path to a file of folder; if the file is archived, optional argument `archive` should be passed with value True.  
 Once the instance has been initialized, use method `execute` to return the results as a dictionary. 
 
@@ -41,6 +29,10 @@ path can also point to an archive of file(s) of a folder, the compress method ca
                 - tar.bz2
                 - tar.xz
                 - zip
+                - 
+## toolbox.dao.files.FileLoader.execute
+*method*, load file(s) 
+Accept kwargs for following methods: `pandas.read_csv`,`pandas.read_excel`,`pandas.read_pickle`,`pandas.read_parquet`,`json.load`
 
 ### toolbox.dao.files.FileLoader.df_dtype_refine
 *method*, refine all Pandas DataFrames by assigning new data types which save more memory
@@ -68,6 +60,8 @@ from toolbox.dao.files import FileLoader
 path = "./projects/test/dev.csv"
 FL = FileLoader(path, archive=False)
 FL.execute()
+## assign a particular separator
+# FL.execute(sep='|')
 
 # for multiple files (assume a number of csv are under directory test)
 path = "./projects/test"
@@ -100,17 +94,17 @@ print(FL.eng_hours) #alternative use: FL["eng_hours"]
 
 
           Area           WS_name  start_ww_num  engg_hours
-0        PHOTO        AMAT_6I_CD        202327      252.00
-1     DRY ETCH    AMAT_ADVTG_MET        202327       28.57
-2    DIFFUSION  AMAT_CENT_DPNRTP        202327       28.38
-3    DIFFUSION     AMAT_CENT_RPO        202327       65.68
-4    DIFFUSION    AMAT_CENT_RPO2        202327       79.75
+0        PHOTO        VENDOR_6I_CD        202327      252.00
+1     DRY ETCH    VENDOR_ADVTG_MET        202327       28.57
+2    DIFFUSION  VENDOR_CENT_DPNRTP        202327       28.38
+3    DIFFUSION     VENDOR_CENT_RPO        202327       65.68
+4    DIFFUSION    VENDOR_CENT_RPO2        202327       79.75
 ..         ...               ...           ...         ...
-174        PVD      ULVAC_ENT_HM        202327       59.00
-175    IMPLANT  VARI_PLAD_HC_B2H        202327       17.47
-176    IMPLANT  VARI_PLAD_HC_BF3        202327       19.65
-177    IMPLANT   VARI_VST900P_MC        202327      120.96
-178    IMPLANT  VARI_VSTTRDXP_HC        202327      260.04
+174        PVD      VENDOR_ENT_HM         202327       59.00
+175    IMPLANT  VENDOR_PLAD_HC_B2H        202327       17.47
+176    IMPLANT  VENDOR_PLAD_HC_BF3        202327       19.65
+177    IMPLANT   VENDOR_VST900P_MC        202327      120.96
+178    IMPLANT  VENDOR_VSTTRDXP_HC        202327      260.04
 
 [179 rows x 4 columns]
 ```
