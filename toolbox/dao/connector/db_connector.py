@@ -35,11 +35,12 @@ def parse_db_access(config_path: str, section_name:str)->Dict:
         _ = config.read(config_path)
 
         db_access = config._sections[section_name]
+        db_access["ssl"] = config._sections["SSL"]
         # db_access = {}
         # db_access["server_username"] = config.get(section_name, 'username')
         # db_access["server_password"] = config.get(section_name, 'password')
         # db_access["server"] = config.get(section_name, 'server')
-        if "db_type" not in db_access.keys(): raise ValueError("can't find key 'db_type'")
+        if "db_type" not in db_access.keys(): raise ValueError("db_type is mandotry for setting db.ini")
         return db_access
 
     except Exception as e:
@@ -231,12 +232,12 @@ class DBConnector:
             "ORACLE":1521,
             "MSSQL":1433,
             "AZURE-BLOB":None,
-            "MYSQL":3307,
+            "MARIADB":3307,
             "REDIS":6380,
             "MONGODB":7374,
         }
 
-    def __init__(self, db_access, **kwargs):
+    def __init__(self, db_access, via_ssl = False, **kwargs):
         """connecting object for a database
 
         Args:
@@ -246,13 +247,15 @@ class DBConnector:
         self.cache_mode = 0
         self.cache_dir = "."
 
+        
         self._db_access = db_access
+        self._via_ssl = via_ssl
 
         self.queries_dir = None             
         self.__not_yet_purge = True
 
         self._db_type, self._port = self._check_nondefault_port()
-
+            
     def set_cache_dir(self, cache_dir: str, cache_mode: _cache_mode_options = 1)->None:
         """set up path for directory where cached files are stored
 
@@ -307,6 +310,12 @@ class DBConnector:
                 self.query_args[k] = str(v.astype('M8[D]'))
 
     
+    def create_engine(self,**kwargs):
+        if self._via_ssl:
+            return create_engine(self._conn_str, connect_args = self._ssl_args,**kwargs)
+        else:
+            return create_engine(self._conn_str,**kwargs)
+    
     def _get_mssql_conn_str(self,):
         conn_str=''.join(
             [
@@ -326,6 +335,10 @@ class DBConnector:
 
     def _get_mariadb_conn_str(self):
         return f"mysql+pymysql://{self._db_access['user']}:{self._db_access['password']}@{self._db_access['host']}:{self._db_access['port']}/{self._db_access['database']}"
+
+    @property
+    def _ssl_args(self):    
+        return {"ssl":self._db_access["ssl"]}
 
     @property
     def _conn_str(self):
@@ -402,8 +415,10 @@ class DBConnector:
                                     }   
         """
         try: 
-            conn_str = self._conn_str
-            eng = create_engine(conn_str, fast_executemany = is_fast_executemany)
+            # conn_str = self._conn_str
+            # eng = create_engine(conn_str)
+
+            eng = self.create_engine()
 
             with eng.connect() as conn:
                 df.to_sql(dest_tb_name, conn, if_exists = if_exists, index = index, index_label=index_label, chunksize=chunksize, dtype=dtype,method=method)
@@ -428,8 +443,10 @@ class DBConnector:
             dfs_generator (Generator): generator for all resulted chunks if chunk_size>1
         """
         try:
-            conn_str = self._conn_str
-            eng = create_engine(conn_str)
+            # conn_str = self._conn_str
+            # eng = create_engine(conn_str)
+
+            eng = self.create_engine()
 
             with eng.connect() as conn:
                 if chunk_size in (None,1):
@@ -539,14 +556,14 @@ class DBConnector:
         query_str= self.load_args_for_predefined_query(query_file,self.query_args)
      
         if chunk_size is None:
-            eng = create_engine(conn_str)
+            eng = self.create_engine()
             chunk_size = estimate_chunk_size(
                 conn_str,
                 query_str,
                 **kwargs
             )
 
-        eng = create_engine(conn_str)
+        eng = self.create_engine()
         
         dfs_generator = read_sql_query_in_chunks_sqlalchemy(
                             query = query_str,
