@@ -9,7 +9,7 @@
 #   python3 -m pip install --user --upgrade setuptools wheel 
 #   #create archive files (could be found in folder dist/)
 #   python3 setup.py sdist bdist_wheel
-# 7. upload the archives to PyPi
+# 7. upload the archives to PyPi (login to Pypi and generate API tocken if not on hand)
 #   #Check that pacakge twine has been installed
 #   python3 -m pip install --user --upgrade twine 
 #   twine upload dist/* 
