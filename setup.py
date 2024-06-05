@@ -1,4 +1,21 @@
-#from setuptools import setup, find_packages
+# Steps for updating this package
+# 1. check files includes private/security info and make sure set .gitignore correctly
+# 2. update markdown document associated to changes, index.md within python modules
+# 3. update README.md, toolbox/change_log.md
+# 4. update setup.py, set a new version number, check if any python package is required by changes and add into the file content
+# 5. delete old archived files under <toolbox-project-directory>/dist/
+# 6. create new archive files for this ditrtibution
+#   #install or upgrade the setuptools and wheel packages in the user's home directory
+#   python3 -m pip install --user --upgrade setuptools wheel 
+#   #create archive files (could be found in folder dist/)
+#   python3 setup.py sdist bdist_wheel
+# 7. upload the archives to PyPi
+#   #Check that pacakge twine has been installed
+#   python3 -m pip install --user --upgrade twine 
+#   twine upload dist/* 
+# 8. test new distribution via pip install liamhsieh-toolbox
+# 9. push all changes to Github
+
 import setuptools
 
 with open("README.md", "r") as fh:
@@ -6,7 +23,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="liamhsieh_toolbox",
-    version = '0.3.5.2',
+    version = '0.3.6.0',
     description = "Collections of Python utility, suppose to be built with Jonathan Carson but he left",
     author = 'Liam Y. Hsieh, PhD',
     author_email = 'liamhsieh@ieee.org',
