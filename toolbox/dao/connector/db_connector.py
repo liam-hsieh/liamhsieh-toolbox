@@ -41,6 +41,9 @@ def parse_db_access(config_path: str, section_name:str)->Dict:
         # db_access["server_password"] = config.get(section_name, 'password')
         # db_access["server"] = config.get(section_name, 'server')
         if "db_type" not in db_access.keys(): raise ValueError("db_type is mandotry for setting db.ini")
+        if db_access["db_type"]=="mssql" and "driver" not in db_access.keys():
+            db_access["driver"] = check_odbc_driver()[0]
+
         return db_access
 
     except Exception as e:
@@ -227,6 +230,25 @@ def read_sql_query_in_chunks_oracle(query:str, connection, chunk_size=20000):
         chunk = cursor.fetchmany(chunk_size)
 
 
+
+def check_odbc_driver():
+    from pyodbc import drivers
+    # Get a list of installed ODBC drivers
+    odbc_drivers = drivers()
+    found_drivers=[]
+    # Check for SQL Server drivers and print their names
+    sql_server_drivers = [driver for driver in odbc_drivers if 'SQL Server' in driver]
+    if sql_server_drivers:
+        
+        for driver in sql_server_drivers:
+            if "ODBC" in driver:
+                found_drivers.append(driver)
+    else:
+        raise Exception("No SQL Server ODBC drivers are found. Please set availavble driver in db.ini file for your SQL Server")
+
+    return found_drivers
+
+
 class DBConnector:
     default_port = {
             "ORACLE":1521,
@@ -242,6 +264,7 @@ class DBConnector:
 
         Args:
             db_access (dict): return of parse_db_access()
+            via_ssl (bool): connect via ssl
         """
         self.logger = logging.getLogger(__name__)
         self.cache_mode = 0
@@ -317,14 +340,30 @@ class DBConnector:
             return create_engine(self._conn_str,**kwargs)
     
     def _get_mssql_conn_str(self,):
-        conn_str=''.join(
-            [
-            'DRIVER={ODBC Driver 17 for SQL Server};',
-            f'SERVER={self._db_access["server"]},{self._port};',
-            f'DATABASE={self._db_access["database_name"]};UID={self._db_access["server_username"]};PWD={self._db_access["server_password"]}'
-            ]
-        )
-        conn_str = URL.create("mssql+pyodbc", query={"odbc_connect": conn_str})
+        driver_name = self._db_access["driver"]
+        match driver_name:
+            case str() as s if "ODBC" in s:
+                conn_str=''.join(
+                    [
+                    'DRIVER={'+ driver_name +'};',
+                    f'SERVER={self._db_access["server"]},{self._port};',
+                    f'DATABASE={self._db_access["database_name"]};UID={self._db_access["server_username"]};PWD={self._db_access["server_password"]}'
+                    ]
+                )
+                conn_str = URL.create("mssql+pyodbc", query={"odbc_connect": conn_str})
+
+            case "FreeTDS":
+                conn_str = URL.create(
+                    'mssql+pyodbc',
+                    username=self._db_access["server_username"],
+                    password=self._db_access["server_password"],
+                    host=self._db_access["server"],
+                    port=self._port,
+                    database=self._db_access["database_name"],
+                    query={
+                        "driver": "FreeTDS",
+                        "TrustServerCertificate": "yes"  
+                    })
         return conn_str
 
     def _get_conn_str_for_cx_Oracle(self):
