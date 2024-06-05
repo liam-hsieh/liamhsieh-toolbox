@@ -3,6 +3,8 @@
 
 - MS SQL Server
 - Oracle
+- MariaDB
+- mongodb (testing)
 - Azure Blob Storage
 
 ## toolbox.dao.connector.parse_db_access
@@ -16,17 +18,20 @@ Returns:
     Dict: access information
 ```
 
-Configuration file should have contents as below, please note that the keys should be the same
+Configuration file should have contents as below, please note that the section [SSL] is required if create connection via ssl, i.e., via_ssl = True. Default port won't be always fit your environment, it is better set in db.ini if this information is given.
+For setting a section for SQL server, you can set driver = FreeTDS if that is the case; package will detect the installed ODBC driver on your machine to create connection if driver is not assigned.
 
 ```ini
-# db_type is mandatory for every section and its value must be an element in (mssql,oracle,azure-blob)
+# db_type is mandatory for every section and its value must be an element in (mssql, oracle, azure-blob, mariadb, mongodb)
+# the only exception is SSL which provides the required infomration to connect via ssl
 
 [<section_name1>]
 server_username = <username>
 server_password = <passwd>
 server = <hostname.domainname>
-database_name = PlanApp
+database_name = <db_name>
 db_type = mssql
+
 
 [<section_name2>]
 server_username = <username>
@@ -34,6 +39,7 @@ server_password = <passwd>
 server = <hostname.domainname>
 service_name = <intended_service_name>
 db_type = oracle
+port = 1521
 
 [<section_name3>]
 DefaultEndpointsProtocol = https
@@ -42,7 +48,22 @@ AccountKey = <Access key>
 EndpointSuffix = core.windows.net
 container = <container name>
 db_type = azure-blob
+
+[<section_name4>]
+user = <username>
+password = <passwd>
+host = <hostname.domainname>
+port = 3307
+database = <db_name>
+raise_on_warnings = True
+db_type = mariadb
+
+[SSL]
+cert = /<path>/<yours>.crt
+key = /<path>/<yours>.key
+ca_certificate = /<path>/<your-chain>.pem
 ```
+
 `parse_db_access` parse .ini file and return required information for creating instance of `DBConnector` 
 
 **example**
@@ -301,6 +322,7 @@ _ = BC.blob_dump(blob_name, to_dataframe=True)
 ```nohighlight
 Args:
   db_access (dict): return of parse_db_access()
+  via_ssl (bool, optional): connect via ssl. Default is False
 ```
 
 ### toolbox.dao.connector.DBConnector.pull_SQL
@@ -317,6 +339,7 @@ Return:
 
 ```python
 from toolbox.dao.connector import DBConnector
+db_access = parse_db_access("db.ini","MariaDB")
 DBC = DBConnector(db_access)
 df = DBC.pull_SQL("select top(2) * from example_DB2..wkg_ww ww")
 print(df)
@@ -329,6 +352,17 @@ print(df)
               end_date work_ww work_mon work_qtr  
 0 1999-01-07 18:59:59     None      None      None  
 1 1999-01-14 18:59:59     None      None      None  
+```
+
+```python
+# connect via ssl
+DBC = DBConnector(db_access,via_ssl=True)
+print(DBC.pull_SQL("SELECT * FROM test_table"))
+```
+```nohighlight
+  id name value 
+0 A1 Milly  100
+1 A2 Liam    60
 ```
 
 ### toolbox.dao.connector.DBConnector.set_queries_dir
