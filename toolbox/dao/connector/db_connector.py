@@ -38,8 +38,7 @@ def parse_db_access(config_path: str, section_name:str)->Dict:
         db_access["ssl"] = config._sections["SSL"]
         # db_access = {}
         # db_access["server_username"] = config.get(section_name, 'username')
-        # db_access["server_password"] = config.get(section_name, 'password')
-        # db_access["server"] = config.get(section_name, 'server')
+
         if "db_type" not in db_access.keys(): raise ValueError("db_type is mandotry for setting db.ini")
         if db_access["db_type"]=="mssql" and "driver" not in db_access.keys():
             db_access["driver"] = check_odbc_driver()[0]
@@ -255,8 +254,6 @@ class DBConnector:
             "MSSQL":1433,
             "AZURE-BLOB":None,
             "MARIADB":3307,
-            "REDIS":6380,
-            "MONGODB":7374,
         }
 
     def __init__(self, db_access, via_ssl = False, **kwargs):
@@ -408,7 +405,7 @@ class DBConnector:
         if query_args is None:
             query_args = self.query_args
 
-        if self.queries_dir not in query_file:
+        if  self.queries_dir not in query_file:
             query_file = os.path.join(self.queries_dir, f"{query_file}.sql")
 
         with open(query_file, 'r') as fname:
@@ -592,7 +589,7 @@ class DBConnector:
         conn_str = self._conn_str
 
         query_file = os.path.join(self.queries_dir, f"{query_name}.sql")
-        query_str= self.load_args_for_predefined_query(query_file,self.query_args)
+        query_str= self.load_args_for_predefined_query(query_file,{**self.query_args,**kwargs})
      
         if chunk_size is None:
             eng = self.create_engine()
@@ -616,7 +613,7 @@ class DBConnector:
         
     def _run_cache_mode_0(self,query_name, **kwargs):
         query_file = os.path.join(self.queries_dir, f"{query_name}.sql")
-        query_str= self.load_args_for_predefined_query(query_file,**self.query_args)
+        query_str= self.load_args_for_predefined_query(query_file,{**self.query_args,**kwargs})
 
         try:
             df = self.pull_SQL(query_str)

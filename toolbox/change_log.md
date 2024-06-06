@@ -1,4 +1,5 @@
 # Change log
+- 0.3.6.2: minor bugs fixed
 - 0.3.6.1: 
   - add `toolbox.container.BoundFuncAsClsMethod`. 
   - `DBConnector` supports MariaDB. 
