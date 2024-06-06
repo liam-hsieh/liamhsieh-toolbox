@@ -1,5 +1,5 @@
 # Change log
-- 0.3.6.0: 
+- 0.3.6.1: 
   - add `toolbox.container.BoundFuncAsClsMethod`. 
   - `DBConnector` supports MariaDB. 
   - add `toolbox.dao.convertor` module; currently supports instance of `FileLoader` as input.
