@@ -1,6 +1,6 @@
 # LiamHsieh toolbox
 Author: Liam Y. Hsieh, PhD  
-Latest update: Oct 2, 2023
+Latest update: Jun 5, 2024
 
 This package is a collection of Python utilities created for benefiting my development of prototypes/Proof-of-concepts regarding data-driven decision science. 
 
