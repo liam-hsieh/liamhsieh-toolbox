@@ -610,3 +610,29 @@ result = dump_dfs_generator(dataframes, keys)
 print(result)
 
 ```
+
+### toolbox.dao.connector.DBConnector.dump_to_db
+*method*, dump a dataframe to a specific db table  
+
+```nohighlight
+Args:
+    df (_type_): _description_
+    dest_tb_name (_type_): _description_
+    is_fast_executemany (bool, optional): _description_. Defaults to True.
+    is_index (bool, optional): add index automatically. Defaults to False.
+    if_exists (str, optional): what to do while data exists in table. 'fail', 'replace', 'append'. Defaults to 'append'.
+                            How to behave if the table already exists.
+                            fail: Raise a ValueError.
+                            replace: Drop the table before inserting new values.
+                            append: Insert new values to the existing table.
+    dtype (dict, optional): dict to dedicate the dtype for each columns. Defaults to None.
+                            example dtype:
+                            using df column names as keys
+                            {
+                            'datefld': sqlalchemy.DateTime(), 
+                            'intfld':  sqlalchemy.types.INTEGER(),
+                            'strfld': sqlalchemy.types.NVARCHAR(length=255)
+                            'floatfld': sqlalchemy.types.Float(precision=3, asdecimal=True)
+                            'booleanfld': sqlalchemy.types.Boolean
+                            }   
+```

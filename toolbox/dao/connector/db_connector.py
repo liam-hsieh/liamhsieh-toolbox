@@ -270,6 +270,8 @@ class DBConnector:
         
         self._db_access = db_access
         self._via_ssl = via_ssl
+        if self.via_ssl:
+            assert "SSL" in self._db_access.keys()
 
         self.queries_dir = None             
         self.__not_yet_purge = True
@@ -427,7 +429,7 @@ class DBConnector:
             chunksize = None,
             method=None,
     ):
-        """_summary_
+        """dump a dataframe to a specific table
 
         Args:
             df (_type_): _description_
