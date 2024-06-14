@@ -478,7 +478,9 @@ class DBConnector:
         eng = self.create_engine()
         try:
             with eng.connect() as conn:
-                return conn.execute(sql_text(statement))
+                rs = conn.execute(sql_text(statement))
+                conn.commit()
+                return rs
         except Exception as e:
             self.logger.error(e)
 
