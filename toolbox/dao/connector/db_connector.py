@@ -270,7 +270,7 @@ class DBConnector:
         
         self._db_access = db_access
         self._via_ssl = via_ssl
-        if self.via_ssl:
+        if self._via_ssl:
             assert "SSL" in self._db_access.keys()
 
         self.queries_dir = None             
