@@ -271,7 +271,8 @@ class DBConnector:
         self._db_access = db_access
         self._via_ssl = via_ssl
         if self._via_ssl:
-            assert "SSL" in self._db_access.keys()
+            if "ssl" not in self._db_access.keys():
+                self.logger.error("Please check db.ini and ensure secton SSL is set correctly while connecting via_ssl")
 
         self.queries_dir = None             
         self.__not_yet_purge = True
