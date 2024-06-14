@@ -465,7 +465,22 @@ class DBConnector:
             self.logger.error(e) 
 
 
-    
+    def exec_SQL(self,statement):
+        """execute general sql statement
+
+        Args:
+            statement (str): SQL statement
+
+        Returns:
+            CursorResult: instance of sqlalchemy.engine.cursor.CursorResult
+        """
+        eng = self.create_engine()
+        try:
+            with eng.connect() as conn:
+                return conn.execute(sql_text(statement))
+        except Exception as e:
+            self.logger.error(e)
+
     def pull_SQL(
             self,
             query,

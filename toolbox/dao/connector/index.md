@@ -611,6 +611,16 @@ print(result)
 
 ```
 
+### toolbox.dao.connector.DBConnector.exec_SQL
+*method*, execute general sql statement
+```nohighlight
+Args:
+    statement (str): SQL statement
+
+Returns:
+    CursorResult: instance of sqlalchemy.engine.cursor.CursorResult
+```
+
 ### toolbox.dao.connector.DBConnector.dump_to_db
 *method*, dump a dataframe to a specific db table  
 
