@@ -23,7 +23,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="liamhsieh_toolbox",
-    version = '0.3.6.3-win',
+    version = '0.3.6.3',
     description = "Collections of Python utility, suppose to be built with Jonathan Carson but he left",
     author = 'Liam Y. Hsieh, PhD',
     author_email = 'liamhsieh@ieee.org',
