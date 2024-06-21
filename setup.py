@@ -23,7 +23,7 @@ with open("README.md", "r") as fh:
 
 setuptools.setup(
     name="liamhsieh_toolbox",
-    version = '0.3.6.3',
+    version = '0.3.6.3-win',
     description = "Collections of Python utility, suppose to be built with Jonathan Carson but he left",
     author = 'Liam Y. Hsieh, PhD',
     author_email = 'liamhsieh@ieee.org',
@@ -49,7 +49,7 @@ setuptools.setup(
         'pyxlsb>=1.0.9',
         'dask>=2024.5.0',
         'filetype>=1.1.0',
-        'cx-Oracle>=8.3.0',
+       # 'cx-Oracle>=8.3.0',
         'pyodbc>=4.0.0',
         'scipy>=1.9.0',
         'scikit-learn>=1.1.2',

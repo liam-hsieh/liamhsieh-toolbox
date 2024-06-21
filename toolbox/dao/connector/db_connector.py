@@ -7,7 +7,7 @@ from typing import Dict, Literal, List
 from functools import lru_cache
 from collections.abc import Generator
 
-import cx_Oracle
+#import cx_Oracle
 import pandas as pd
 import numpy as np
 from sqlalchemy import create_engine
